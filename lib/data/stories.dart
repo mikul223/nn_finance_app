@@ -297,7 +297,7 @@ final List<Story> stories = [
      StoryLine(
       text: '[Саша стоит перед величественным классическим зданием Главного ярмарочного дома. Сжимает в руке монету. Смотрит на нее]',
       isNarration: true,
-      backgroundImage: 'assets/images/fair_cards.png',
+      backgroundImage: 'assets/images/nn_fair.png',
     ),
     StoryLine(
       text: '''(сам себе)
@@ -369,8 +369,6 @@ final List<Story> stories = [
       backgroundImage: 'assets/images/white_flash.png',
     ),
     
-
-//ЗАМЕНИТЬ БУГРОВА НА ФОТО В СТАРОМ КОСТЮМЕ 
         //СЦЕНА 7: ЯРМАРКА 1885 ГОДА
     StoryLine(
       text: '[Саша падает на колени. Монета в руке гаснет, превращаясь в обычный потемневший пятак. Медленно поднимает голову]',
@@ -387,7 +385,7 @@ final List<Story> stories = [
 Господи... Я сошел с ума. Или...''',
       character: 'Александр Бугров',
       isMainHero: true,
-      image: 'assets/images/alex.png',
+      image: 'assets/images/alex2.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -400,7 +398,7 @@ final List<Story> stories = [
 Это невозможно. Такого не бывает!''',
       character: 'Александр Бугров',
       isMainHero: true,
-      image: 'assets/images/alex.png',
+      image: 'assets/images/alex2.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -426,7 +424,7 @@ final List<Story> stories = [
 Я... вы... кто вы? Где я?!''',
       character: 'Александр Бугров',
       isMainHero: true,
-      image: 'assets/images/alex.png',
+      image: 'assets/images/alex2.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -440,7 +438,7 @@ final List<Story> stories = [
       text: '''Приказчик? Мой? Нет, вы не понимаете, я не...''',
       character: 'Александр Бугров',
       isMainHero: true,
-      image: 'assets/images/alex.png',
+      image: 'assets/images/alex2.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -457,7 +455,7 @@ final List<Story> stories = [
 Николай Александрович... Бугров?''',
       character: 'Александр Бугров',
       isMainHero: true,
-      image: 'assets/images/alex.png',
+      image: 'assets/images/alex2.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -476,7 +474,7 @@ final List<Story> stories = [
 Я попал в прошлое? Николай Бугров. Я его племянник. Это... это реально происходит.''',
       character: 'Александр Бугров',
       isMainHero: true,
-      image: 'assets/images/alex.png',
+      image: 'assets/images/alex2.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -491,7 +489,7 @@ final List<Story> stories = [
 Ничего. Я... расскажите, что случилось?''',
       character: 'Александр Бугров',
       isMainHero: true,
-      image: 'assets/images/alex.png',
+      image: 'assets/images/alex2.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -518,7 +516,7 @@ final List<Story> stories = [
 Я... я попробую.''',
       character: 'Александр Бугров',
       isMainHero: true,
-      image: 'assets/images/alex.png',
+      image: 'assets/images/alex2.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     ],
