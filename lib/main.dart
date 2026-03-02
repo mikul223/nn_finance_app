@@ -4,6 +4,8 @@ import 'settings/app_settings.dart';
 import 'settings/story_progress.dart';
 import 'screens/splash_screen.dart';
 import 'services/user_location_service.dart';
+import 'screens/help_screen.dart';
+import 'services/podcast_manager.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +15,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => AppSettings()),
         ChangeNotifierProvider(create: (_) => StoryProgress()),
+        ChangeNotifierProvider(
+          create: (_) => PodcastManager(articles: HelpScreen.articleCards),
+        ),
         ChangeNotifierProvider(
           create: (_) {
             final service = UserLocationService();

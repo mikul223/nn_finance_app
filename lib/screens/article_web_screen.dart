@@ -24,7 +24,6 @@ class _ArticleWebScreenState extends State<ArticleWebScreen> {
   void initState() {
     super.initState();
 
-    // Настройка контроллера WebView
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
