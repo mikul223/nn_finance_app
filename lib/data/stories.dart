@@ -416,7 +416,7 @@ final List<Story> stories = [
       text: '''(облегченно)
 Слава Богу, вы услышали! Я уж думал, не успею достучаться. Идемте скорее, Николай Александрович велел вас сразу к себе вести, как только появитесь.''',
       character: 'Громов',
-      // image: пока нет картинки
+      image: 'assets/images/gromov.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -431,7 +431,7 @@ final List<Story> stories = [
       text: '''(озадаченно)
 Михаил Громов, приказчик ваш. Неужто не узнаете? Александр Николаевич, вы себя хорошо чувствуете? Не ушиблись по дороге?''',
       character: 'Громов',
-      // image: пока нет картинки
+      image: 'assets/images/gromov.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -445,11 +445,10 @@ final List<Story> stories = [
       text: '''(перебивает, встревоженно)
 Времени нет на шутки! Беда большая у дядюшки вашего, у Николая Александровича. К вечеру — собрание купечества, а тут заговор против него. Вы же обещали помочь разобраться! Неужто забыли?''',
       character: 'Громов',
-      // image: пока нет картинки
+      image: 'assets/images/gromov.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
 
-    //ист  справка про бугрова старшего
     StoryLine(
       text: '''(медленно)
 Николай Александрович... Бугров?''',
@@ -458,10 +457,23 @@ final List<Story> stories = [
       image: 'assets/images/alex2.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
+
+    StoryLine(
+      text: '', 
+      isNarration: true,
+      isInfoCard: true,
+      infoTitle: 'Николай Александрович Бугров',
+      infoDescription: 'Фигура в нижегородской истории легендарная и парадоксальная, а для вас, главного героя, ещё и родной дядя. Одни звали его «хлебным королём России», другие — «миллионером-босяком», и оба прозвища были правдой. Из старообрядческой семьи, вышедшей из удельных крестьян, он поднял мукомольное дело на такую высоту, что кормил хлебом всю армию империи, а на Всероссийской выставке получил право ставить на своих мешках государственный герб. Управлял огромным флотом и мельницами всего с двумя помощниками — приказчиком да бухгалтером, а рабочим установил восьмичасовой день и платил больше московского.',
+      infoImage: 'assets/images/bugrov_real.png', 
+      backgroundImage: 'assets/images/fair_cards.png',
+    ),
+
+
+
     StoryLine(
       text: '''Ну разумеется! Кто же еще? Дядюшка ваш, благодетель, хлебный король всего Поволжья! Идемте же, он вас ждет.''',
       character: 'Громов',
-      // image: пока нет картинки
+      image: 'assets/images/gromov.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -481,7 +493,7 @@ final List<Story> stories = [
       text: '''(через плечо)
 Что говорите?''',
       character: 'Громов',
-      // image: пока нет картинки
+      image: 'assets/images/gromov.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -496,7 +508,7 @@ final List<Story> stories = [
       text: '''(мрачнея)
 Кто-то пустил слух, что мука дядюшки заражена спорыньей. Три крупных заказчика уже отказались от контрактов. А сегодня вечером решается судьба главного — с армией. Если и этот сорвется — конец. Разорение. А Николай Александрович столько добра людям сделал...''',
       character: 'Громов',
-      // image: пока нет картинки
+      image: 'assets/images/gromov.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -508,7 +520,7 @@ final List<Story> stories = [
       text: '''(останавливается у входа, серьезно смотрит на Сашу)
 Вы — единственная надежда, Александр Николаевич. У вас голова светлая, образование столичное. Дядюшка говорит — вы видите то, что другие не замечают. Найдите, кто за этим стоит. До вечерней службы в Спасском соборе. Иначе...''',
       character: 'Громов',
-      // image: пока нет картинки
+      image: 'assets/images/gromov.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
     StoryLine(
@@ -519,6 +531,15 @@ final List<Story> stories = [
       image: 'assets/images/alex2.png',
       backgroundImage: 'assets/images/fair_cards.png',
     ),
+
+    // ПЕРЕХОД К ТОЧКЕ 1
+
+    
+
+
+
+
+
     ],
   ),
 

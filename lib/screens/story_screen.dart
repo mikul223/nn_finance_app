@@ -19,6 +19,9 @@ class StoryScreen extends StatefulWidget {
 }
 
 class _StoryScreenState extends State<StoryScreen> {
+  int _characterKeyCounter = 0;
+  int _cachedGold = 0;
+  int _cachedSilver = 0;
   late FlutterTts _tts;
   bool _isAudioMode = false;
   bool _isDisposed = false;
@@ -56,7 +59,9 @@ class _StoryScreenState extends State<StoryScreen> {
 
     _tts.setCompletionHandler(() {
       _isSpeaking = false;
-      if (_isAudioMode && !_isDisposed) _playNextLine();
+      if (_isAudioMode && !_isDisposed && mounted) {
+        _playNextLine();
+      }
     });
   }
 
@@ -130,7 +135,11 @@ class _StoryScreenState extends State<StoryScreen> {
       const int silverEarned = 10;
       currency.addGold(goldEarned);
       currency.addSilver(silverEarned);
-      _endStoryProcessed = true;
+
+      _cachedGold = currency.gold;
+      _cachedSilver = currency.silver;
+      
+       _endStoryProcessed = true;
     }
 
     return Scaffold(
@@ -140,9 +149,7 @@ class _StoryScreenState extends State<StoryScreen> {
           children: [
             PageView(
               controller: _pageController,
-              physics: _isOnMapPage
-                  ? const NeverScrollableScrollPhysics()
-                  : const PageScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (index) {
                 setState(() => _isOnMapPage = index == 1);
               },
@@ -203,13 +210,111 @@ class _StoryScreenState extends State<StoryScreen> {
     );
   }
 
+  Widget _buildInfoCard(StoryLine current, AppSettings settings) {
+  return Stack(
+    children: [
+      if (current.backgroundImage != null)
+        Positioned.fill(
+          child: Image.asset(
+            current.backgroundImage!,
+            fit: BoxFit.cover,
+          ),
+        ),
+      Container(color: Colors.black.withOpacity(0.6)),
+      Center(
+        child: Container(
+          margin: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFFD2B48C), width: 3),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (current.infoImage != null)
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(21),
+                  ),
+                  child: Image.asset(
+                    current.infoImage!,
+                    height: 160,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Text(
+                      current.infoTitle ?? 'Справка',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5D3A1A),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      current.infoDescription ?? '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    GestureDetector(
+                      onTap: () {
+                        if (!mounted) return;
+                        context.read<StoryProgress>().next(
+                          widget.story.id,
+                          widget.story.lines.length,
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFD2B48C),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Text(
+                          'Понятно',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+
   Widget _buildStoryContent(BuildContext context, StoryLine current,
       AppSettings settings, StoryProgress progress) {
+
+    if (current.isInfoCard) {
+      return _buildInfoCard(current, settings);
+    }
+        
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () async {
         if (!_isAudioMode) {
           await _tts.stop();
+          if (!mounted) return;
           progress.next(widget.story.id, widget.story.lines.length);
         }
       },
@@ -252,7 +357,7 @@ class _StoryScreenState extends State<StoryScreen> {
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
                 child: Transform.translate(
-                  key: ValueKey(current.image), 
+                  key: ValueKey('char_${current.image}_${_characterKeyCounter++}'),
                   offset: current.isMainHero ? const Offset(60, 50) : const Offset(-60, 50),
                   child: Image.asset(
                     current.image!,
@@ -376,153 +481,149 @@ class _StoryScreenState extends State<StoryScreen> {
     );
   }
 
-  Widget _buildEndStory(
-      BuildContext context, AppSettings settings, StoryProgress progress) {
-    final currency = context.read<CurrencyManager>();
-    final int currentGold = currency.gold;
-    final int currentSilver = currency.silver;
 
-    const int goldEarned = 5;
-    const int silverEarned = 10;
 
-    const goldColor = Colors.amber;
-    const silverColor = Colors.grey;
+Widget _buildEndStory(BuildContext context, AppSettings settings, StoryProgress progress) {
+  const int goldEarned = 5;
+  const int silverEarned = 10;
+  const goldColor = Colors.amber;
+  const silverColor = Colors.grey;
 
-    return Stack(
-      children: [
-        if (widget.story.coverImage != null && settings.imagesEnabled)
-          Positioned.fill(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              alignment: Alignment.center,
-              child: Image.asset(widget.story.coverImage!),
-            ),
-          )
-        else
-          Positioned.fill(child: Container(color: settings.backgroundColor)),
-        Positioned.fill(child: Container(color: Colors.black.withOpacity(0.65))),
+  return Stack(
+    children: [
+      if (widget.story.coverImage != null && settings.imagesEnabled)
+        Positioned.fill(
+          child: FittedBox(
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+            child: Image.asset(widget.story.coverImage!),
+          ),
+        )
+      else
+        Positioned.fill(child: Container(color: settings.backgroundColor)),
+      Positioned.fill(child: Container(color: Colors.black.withOpacity(0.65))),
 
-        Positioned(
-          top: MediaQuery.of(context).padding.top + 12,
-          left: 12,
-          child: Material(
-            color: Colors.white,
-            shape: const CircleBorder(),
-            elevation: 4,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () async {
-                _isSpeaking = false;
-                await _tts.stop();
+      Positioned(
+        top: MediaQuery.of(context).padding.top + 12,
+        left: 12,
+        child: Material(
+          color: Colors.white,
+          shape: const CircleBorder(),
+          elevation: 4,
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () async {
+              _isSpeaking = false;
+              await _tts.stop();
+              if (!mounted) return;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (!mounted) return;
-
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (!mounted) return;
-                  Navigator.of(context).pop();
-                });
-              },
-            ),
+                Navigator.of(context).pop();
+              });
+            },
           ),
         ),
+      ),
 
-        Center(
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 40),
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.95),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Конец истории',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 28 * settings.textScale,
-                    fontWeight: FontWeight.bold,
-                    color: settings.textColor,
+      Center(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.95),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Конец истории',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 28 * settings.textScale,
+                  fontWeight: FontWeight.bold,
+                  color: settings.textColor,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  progress.reset(widget.story.id);
+                  _pageController.jumpToPage(0);
+                },
+                child: const Text('Начать заново'),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          color: goldColor,
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '+$goldEarned',
+                          style: TextStyle(
+                            fontSize: 14 * settings.textScale,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Всего: $_cachedGold', // ← из кэша
+                        style: TextStyle(
+                          fontSize: 14 * settings.textScale,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    progress.reset(widget.story.id);
-                    _pageController.jumpToPage(0);
-                  },
-                  child: const Text('Начать заново'),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: const BoxDecoration(
-                            color: goldColor,
-                            shape: BoxShape.circle,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            '+$goldEarned',
-                            style: TextStyle(
-                              fontSize: 14 * settings.textScale,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
+                  const SizedBox(width: 40),
+                  Column(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          color: silverColor,
+                          shape: BoxShape.circle,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Всего: $currentGold',
+                        alignment: Alignment.center,
+                        child: Text(
+                          '+$silverEarned',
                           style: TextStyle(
                             fontSize: 14 * settings.textScale,
-                            color: Colors.black87,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(width: 40),
-                    Column(
-                      children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: const BoxDecoration(
-                            color: silverColor,
-                            shape: BoxShape.circle,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            '+$silverEarned',
-                            style: TextStyle(
-                              fontSize: 14 * settings.textScale,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Всего: $_cachedSilver', 
+                        style: TextStyle(
+                          fontSize: 14 * settings.textScale,
+                          color: Colors.black87,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Всего: $currentSilver',
-                          style: TextStyle(
-                            fontSize: 14 * settings.textScale,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 }

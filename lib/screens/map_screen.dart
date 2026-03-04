@@ -19,6 +19,8 @@ class _MapScreenState extends State<MapScreen> {
   final Completer<YandexMapController> _controllerCompleter = Completer();
   YandexMapController? _mapController;
 
+  late final UserLocationService _locationService;
+
   bool _isCameraMoved = false;
 
   final List<StoryLocation> locations = const [
@@ -36,14 +38,13 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-
-    final locationService = context.read<UserLocationService>();
-    locationService.startTracking();
-
-    locationService.addListener(_onLocationUpdate);
+    _locationService = context.read<UserLocationService>();
+    _locationService.startTracking();
+    _locationService.addListener(_onLocationUpdate);
   }
 
   void _onLocationUpdate() async {
+    if (!mounted) return;
     final locationService = context.read<UserLocationService>();
 
     if (_mapController == null) return;
@@ -68,7 +69,7 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void dispose() {
-    context.read<UserLocationService>().removeListener(_onLocationUpdate);
+    _locationService.removeListener(_onLocationUpdate);
     super.dispose();
   }
 
@@ -82,6 +83,7 @@ class _MapScreenState extends State<MapScreen> {
 
           YandexMap(
             onMapCreated: (controller) async {
+              if (!mounted) return;
               _mapController = controller;
 
               final locationService =

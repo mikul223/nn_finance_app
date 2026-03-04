@@ -20,6 +20,11 @@ class StoryLine {
   final bool isNarration;
   final String? backgroundImage;
 
+  final bool isInfoCard;
+  final String? infoTitle;
+  final String? infoDescription;
+  final String? infoImage;
+
   StoryLine({
     required this.text,
     this.character,
@@ -27,5 +32,10 @@ class StoryLine {
     this.isMainHero = false,
     this.isNarration = false,
     this.backgroundImage,
+
+    this.isInfoCard = false,
+    this.infoTitle,
+    this.infoDescription,
+    this.infoImage,
   });
 }
