@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/currency_bar.dart';
 import '../repositories/story_repository.dart';
 import '../settings/app_settings.dart';
 import 'story_screen.dart';
@@ -175,7 +176,21 @@ class MainMenu extends StatelessWidget {
           ],
         ),
       ),
-      body: _StoriesStackView(stories: stories),
+      body: Column(
+        children: [
+          const SizedBox(height: 16),
+
+          Center(
+            child: CurrencyBar(),
+          ),
+
+          const SizedBox(height: 12),
+
+          Expanded(
+            child: _StoriesStackView(stories: stories),
+          ),
+        ],
+      ),
     );
   }
 }

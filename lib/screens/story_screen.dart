@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+import '../settings/currency_manager.dart';
+import '../widgets/currency_bar.dart';
 import '../settings/story_progress.dart';
 import '../settings/app_settings.dart';
 import '../models/story_model.dart';
@@ -25,6 +27,8 @@ class _StoryScreenState extends State<StoryScreen> {
 
   late PageController _pageController;
 
+  bool _endStoryProcessed = false; // флаг, чтобы валюту начислять один раз
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +47,6 @@ class _StoryScreenState extends State<StoryScreen> {
   Future<void> _initTts() async {
     _tts = FlutterTts();
     await _tts.setLanguage("ru-RU");
-
     var voices = await _tts.getVoices;
     for (var v in voices) debugPrint("TTS Voice: $v");
 
@@ -88,14 +91,12 @@ class _StoryScreenState extends State<StoryScreen> {
   void _playNextLine() async {
     final progress = context.read<StoryProgress>();
     final lines = widget.story.lines;
-    final currentIndex = progress.getIndex(widget.story.id);
 
-    if (currentIndex < lines.length) {
-      progress.next(widget.story.id, lines.length);
-      if (progress.getIndex(widget.story.id) < lines.length) {
-        final current = lines[progress.getIndex(widget.story.id)];
-        await _speakLine(current);
-      }
+    progress.next(widget.story.id, lines.length);
+    final newIndex = progress.getIndex(widget.story.id);
+
+    if (newIndex < lines.length) {
+      await _speakLine(lines[newIndex]);
     }
   }
 
@@ -105,8 +106,12 @@ class _StoryScreenState extends State<StoryScreen> {
     final lines = widget.story.lines;
     final index = progress.getIndex(widget.story.id);
 
-    if (_isAudioMode && index < lines.length) await _speakLine(lines[index]);
-    else await _tts.stop();
+    if (_isAudioMode && index < lines.length) {
+      await _speakLine(lines[index]);
+    } else {
+      await _tts.stop();
+      _isSpeaking = false;
+    }
   }
 
   @override
@@ -115,6 +120,16 @@ class _StoryScreenState extends State<StoryScreen> {
     final settings = context.watch<AppSettings>();
     final lines = widget.story.lines;
     final isEnd = progress.isCompleted(widget.story.id, lines.length);
+
+    // Начисление валюты один раз при достижении конца истории
+    if (isEnd && !_endStoryProcessed) {
+      final currency = context.read<CurrencyManager>();
+      const int goldEarned = 5;
+      const int silverEarned = 10;
+      currency.addGold(goldEarned);
+      currency.addSilver(silverEarned);
+      _endStoryProcessed = true;
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -138,12 +153,12 @@ class _StoryScreenState extends State<StoryScreen> {
                         settings,
                         progress,
                       ),
-
                 MapScreen(onBackToStory: _goToStoryPage),
               ],
             ),
 
-            if (!_isOnMapPage)
+            // Верхние кнопки отображаем только если не конец истории
+            if (!_isOnMapPage && !isEnd)
               Positioned(
                 top: MediaQuery.of(context).padding.top + 12,
                 left: 12,
@@ -151,27 +166,32 @@ class _StoryScreenState extends State<StoryScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Material(
-                      color: Colors.white,
-                      shape: const CircleBorder(),
-                      elevation: 4,
-                      child: IconButton(
-                        icon: const Icon(Icons.close, color: Colors.black),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ),
-
-                    Material(
-                      color: Colors.white,
-                      shape: const CircleBorder(),
-                      elevation: 4,
-                      child: IconButton(
-                        icon: Icon(
-                          _isAudioMode ? Icons.headphones : Icons.menu_book,
-                          color: Colors.black,
+                    const CurrencyBar(),
+                    Row(
+                      children: [
+                        Material(
+                          color: Colors.white,
+                          shape: const CircleBorder(),
+                          elevation: 4,
+                          child: IconButton(
+                            icon: const Icon(Icons.close, color: Colors.black),
+                            onPressed: () => Navigator.pop(context),
+                          ),
                         ),
-                        onPressed: () => _toggleAudioMode(progress),
-                      ),
+                        const SizedBox(width: 8),
+                        Material(
+                          color: Colors.white,
+                          shape: const CircleBorder(),
+                          elevation: 4,
+                          child: IconButton(
+                            icon: Icon(
+                              _isAudioMode ? Icons.headphones : Icons.menu_book,
+                              color: Colors.black,
+                            ),
+                            onPressed: () => _toggleAudioMode(progress),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -226,52 +246,22 @@ class _StoryScreenState extends State<StoryScreen> {
             ),
           ),
           if (settings.imagesEnabled && current.image != null)
-          Align(
-            alignment: current.isMainHero
-            ? Alignment.bottomRight
-            : Alignment.bottomLeft,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 500),
-            child: Transform.translate(
-              key: ValueKey('char_${current.image}_${current.hashCode}'),
-              offset: current.isMainHero
-              ? const Offset(60, 50)
-              : const Offset(-60, 50),
-              child: Image.asset(
-                current.image!,
-                
-                height: MediaQuery.of(context).size.height * 0.88, // 85% экрана
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          ),
-          
-/*
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
+            Align(
+              alignment: current.isMainHero ? Alignment.bottomRight : Alignment.bottomLeft,
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
                 child: Transform.translate(
-                  key: ValueKey(current.image),
-                  offset: current.isMainHero
-                      ? const Offset(60, 0)
-                      : const Offset(-60, 0),
+                  key: ValueKey(current.image), 
+                  offset: current.isMainHero ? const Offset(60, 50) : const Offset(-60, 50),
                   child: Image.asset(
                     current.image!,
-                    height: MediaQuery.of(context).size.height * 0.65,
-                    fit: BoxFit.contain,
-                    alignment: current.isMainHero
-                        ? Alignment.bottomRight
-                        : Alignment.bottomLeft,
+                    height: MediaQuery.of(context).size.height * 0.88,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
             ),
-*/
 
           if (current.isNarration)
             Center(child: _buildNarrationBubble(context, current, settings)),
@@ -387,20 +377,50 @@ class _StoryScreenState extends State<StoryScreen> {
 
   Widget _buildEndStory(
       BuildContext context, AppSettings settings, StoryProgress progress) {
+    // Получаем валюту *разово*, чтобы не зависеть от контекста после pop
+    final currency = context.read<CurrencyManager>();
+    final int currentGold = currency.gold;
+    final int currentSilver = currency.silver;
+
+    const int goldEarned = 5;
+    const int silverEarned = 10;
+
+    const goldColor = Colors.amber;
+    const silverColor = Colors.grey;
+
     return Stack(
       children: [
-        Positioned.fill(
-          child: settings.imagesEnabled && widget.story.coverImage != null
-              ? Image.asset(widget.story.coverImage!, fit: BoxFit.cover)
-              : Container(color: settings.backgroundColor),
+        Positioned.fill(child: Container(color: settings.backgroundColor)),
+        Positioned.fill(child: Container(color: Colors.black.withOpacity(0.65))),
+
+        // Кнопка "назад"
+        Positioned(
+          top: MediaQuery.of(context).padding.top + 12,
+          left: 12,
+          child: Material(
+            color: Colors.white,
+            shape: const CircleBorder(),
+            elevation: 4,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {
+                // Останавливаем озвучку и предотвращаем дальнейшие колбэки
+                _tts.stop();
+                _isSpeaking = false;
+
+                // Безопасный pop после окончания текущего фрейма
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(context).pop();
+                });
+              },
+            ),
+          ),
         ),
-        Positioned.fill(
-            child: Container(color: Colors.black.withOpacity(0.65))),
+
         Center(
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 40),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.95),
               borderRadius: BorderRadius.circular(24),
@@ -421,8 +441,74 @@ class _StoryScreenState extends State<StoryScreen> {
                 ElevatedButton(
                   onPressed: () {
                     progress.reset(widget.story.id);
+                    _pageController.jumpToPage(0);
                   },
                   child: const Text('Начать заново'),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            color: goldColor,
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '+$goldEarned',
+                            style: TextStyle(
+                              fontSize: 14 * settings.textScale,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Всего: $currentGold',
+                          style: TextStyle(
+                            fontSize: 14 * settings.textScale,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 40),
+                    Column(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            color: silverColor,
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '+$silverEarned',
+                            style: TextStyle(
+                              fontSize: 14 * settings.textScale,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Всего: $currentSilver',
+                          style: TextStyle(
+                            fontSize: 14 * settings.textScale,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),

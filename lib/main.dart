@@ -5,6 +5,7 @@ import 'settings/story_progress.dart';
 import 'screens/splash_screen.dart';
 import 'services/user_location_service.dart';
 import 'services/podcast_manager.dart';
+import 'settings/currency_manager.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +16,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AppSettings()),
         ChangeNotifierProvider(create: (_) => StoryProgress()),
         ChangeNotifierProvider(create: (_) => PodcastManager()),
+        ChangeNotifierProvider(create: (_) => CurrencyManager()),
         ChangeNotifierProvider(
           create: (_) {
             final service = UserLocationService();

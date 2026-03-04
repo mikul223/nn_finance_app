@@ -4,6 +4,7 @@ import 'package:flip_card/flip_card.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+import 'virtual_tour_screen.dart';
 import '../settings/app_settings.dart';
 import '../services/podcast_manager.dart';
 
@@ -210,7 +211,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 ],
               ),
             ),
-            const FloatingPodcastButton(),
+            const FloatingExpandButton(),
             if (podcastManager.isPanelVisible)
               PodcastPanel(manager: podcastManager, onClose: () => podcastManager.hidePanel()),
           ],
@@ -371,24 +372,68 @@ class _HelpScreenState extends State<HelpScreen> {
   }
 }
 
-class FloatingPodcastButton extends StatelessWidget {
-  const FloatingPodcastButton({super.key});
+class FloatingExpandButton extends StatefulWidget {
+  const FloatingExpandButton({super.key});
+
+  @override
+  State<FloatingExpandButton> createState() => _FloatingExpandButtonState();
+}
+
+class _FloatingExpandButtonState extends State<FloatingExpandButton>
+    with SingleTickerProviderStateMixin {
+  bool isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
       bottom: 24,
       right: 24,
-      child: FloatingActionButton(
-        mini: true,
-        backgroundColor: Colors.brown.shade300,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const PodcastScreen()),
-          );
-        },
-        child: const Icon(Icons.podcasts),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (isExpanded) ...[
+            FloatingActionButton(
+              heroTag: "tour",
+              mini: true,
+              backgroundColor: Colors.brown.shade300,
+              child: const Icon(Icons.account_balance),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const VirtualTourScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
+              heroTag: "podcast",
+              mini: true,
+              backgroundColor: Colors.brown.shade300,
+              child: const Icon(Icons.podcasts),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const PodcastScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
+          FloatingActionButton(
+            heroTag: "main",
+            backgroundColor: Colors.brown.shade300,
+            child: Icon(isExpanded ? Icons.close : Icons.keyboard_arrow_up),
+            onPressed: () {
+              setState(() {
+                isExpanded = !isExpanded;
+              });
+            },
+          ),
+        ],
       ),
     );
   }
