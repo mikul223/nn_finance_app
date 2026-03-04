@@ -27,7 +27,7 @@ class _StoryScreenState extends State<StoryScreen> {
 
   late PageController _pageController;
 
-  bool _endStoryProcessed = false; // флаг, чтобы валюту начислять один раз
+  bool _endStoryProcessed = false;
 
   @override
   void initState() {
@@ -124,7 +124,6 @@ class _StoryScreenState extends State<StoryScreen> {
     final lines = widget.story.lines;
     final isEnd = progress.isCompleted(widget.story.id, lines.length);
 
-    // Начисление валюты один раз при достижении конца истории
     if (isEnd && !_endStoryProcessed) {
       final currency = context.read<CurrencyManager>();
       const int goldEarned = 5;
@@ -160,7 +159,6 @@ class _StoryScreenState extends State<StoryScreen> {
               ],
             ),
 
-            // Верхние кнопки отображаем только если не конец истории
             if (!_isOnMapPage && !isEnd)
               Positioned(
                 top: MediaQuery.of(context).padding.top + 12,
@@ -380,7 +378,6 @@ class _StoryScreenState extends State<StoryScreen> {
 
   Widget _buildEndStory(
       BuildContext context, AppSettings settings, StoryProgress progress) {
-    // Получаем валюту *разово*, чтобы не зависеть от контекста после pop
     final currency = context.read<CurrencyManager>();
     final int currentGold = currency.gold;
     final int currentSilver = currency.silver;
@@ -405,7 +402,6 @@ class _StoryScreenState extends State<StoryScreen> {
           Positioned.fill(child: Container(color: settings.backgroundColor)),
         Positioned.fill(child: Container(color: Colors.black.withOpacity(0.65))),
 
-        // Кнопка "назад"
         Positioned(
           top: MediaQuery.of(context).padding.top + 12,
           left: 12,
@@ -420,7 +416,6 @@ class _StoryScreenState extends State<StoryScreen> {
                 await _tts.stop();
                 if (!mounted) return;
 
-                // Отложенный pop, чтобы Flutter успел завершить зависимости
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (!mounted) return;
                   Navigator.of(context).pop();
