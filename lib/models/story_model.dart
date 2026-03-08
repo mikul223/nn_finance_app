@@ -4,11 +4,20 @@ class Story {
   final String? coverImage;
   final List<StoryLine> lines;
 
+  final String description;
+  final int routePoints;     
+  final int routeTime;
+  final String status;
+
   Story({
     required this.id,
     required this.title,
     this.coverImage,
     required this.lines,
+    required this.description,
+    required this.routePoints,
+    required this.routeTime,
+    required this.status,
   });
 }
 

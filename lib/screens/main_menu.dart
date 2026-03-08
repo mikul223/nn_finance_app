@@ -7,6 +7,7 @@ import '../settings/app_settings.dart';
 import 'story_screen.dart';
 import 'settings_screen.dart';
 import 'accessibility_screen.dart';
+import 'story_details_screen.dart';
 
 class MainMenu extends StatelessWidget {
   const MainMenu({super.key});
@@ -92,7 +93,7 @@ class MainMenu extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => StoryScreen(story: story),
+                            builder: (_) => StoryDetailsScreen(story: story),
                           ),
                         );
                       },
@@ -245,7 +246,7 @@ class _StoriesStackViewState extends State<_StoriesStackView> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => StoryScreen(story: story),
+                        builder: (_) => StoryDetailsScreen(story: story),
                       ),
                     );
                   },
