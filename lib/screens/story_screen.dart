@@ -246,7 +246,7 @@ class _StoryScreenState extends State<StoryScreen> {
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.white,          // <-- белый фон для текста
+              color: Colors.white,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(color: const Color(0xFFD2B48C), width: 3),
             ),
@@ -390,8 +390,8 @@ class _StoryScreenState extends State<StoryScreen> {
               alignment: current.isMainHero ? Alignment.bottomRight : Alignment.bottomLeft,
               child: Transform.translate(
                 offset: current.isMainHero 
-                    ? const Offset(40, 0)  // сдвиг вправо от центра
-                    : const Offset(-40, 0), // сдвиг влево от центра
+                    ? const Offset(40, 0)
+                    : const Offset(-40, 0),
                 child: Image.asset(
                   current.image!,
                   height: MediaQuery.of(context).size.height * 0.88,
