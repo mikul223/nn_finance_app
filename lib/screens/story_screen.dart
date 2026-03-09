@@ -9,7 +9,6 @@ import '../settings/app_settings.dart';
 import '../models/story_model.dart';
 import 'map_screen.dart';
 import 'choice_screen.dart';
-import '../settings/story_progress.dart';
 
 
 class StoryScreen extends StatefulWidget {

@@ -522,10 +522,37 @@ final List<Story> stories = [
     ),
     StoryLine(
       text: '''(останавливается у входа, серьезно смотрит на Сашу)
-Вы — единственная надежда, Александр Николаевич. У вас голова светлая, образование столичное. Дядюшка говорит — вы видите то, что другие не замечают. Найдите, кто за этим стоит. До вечерней службы в Спасском соборе. Иначе...''',
+    Вы — единственная надежда, Александр Николаевич...''',
       character: 'Громов',
       image: 'assets/images/gromov.png',
+
       backgroundImage: 'assets/images/fair_cards.png',
+      task: InteractiveTask(
+        question: 'Прежде чем согласиться на помощь, выбери три правдивых факта о Бугрове:',
+        requiredCorrect: 3,
+        options: [
+          InteractiveOption(
+            text: 'Основал Нижегородский университет',
+            isCorrect: false,
+          ),
+          InteractiveOption(
+            text: 'Построил первую в Нижнем Новгороде ночлежку для бездомных',
+            isCorrect: true,
+          ),
+          InteractiveOption(
+            text: 'Владел хлебными мельницами и назывался «хлебным королем»',
+            isCorrect: true,
+          ),
+          InteractiveOption(
+            text: 'Финансировал строительство больниц и приютов',
+            isCorrect: true,
+          ),
+          InteractiveOption(
+            text: 'Был художником, писал картины маслом',
+            isCorrect: false,
+          ),
+        ],
+      ),
     ),
     StoryLine(
       text: '''(выпрямляется, кивает)
